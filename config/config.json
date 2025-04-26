@@ -1,0 +1,34 @@
+{
+  "development": {
+    "username": "streamcloud_user",
+    "password": "arunTesting#12345",
+    "database": "streamcloud_db",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "streamcloud_user",
+    "password": "arunTesting#12345",
+    "database": "streamcloud_test",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres",
+    "logging": false
+  },
+  "production": {
+    "username": "streamcloud_user",
+    "password": "arunTesting#12345",
+    "database": "streamcloud_db",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres",
+    "logging": false,
+    "pool": {
+      "max": 10,
+      "min": 0,
+      "acquire": 30000,
+      "idle": 10000
+    }
+  }
+}
