@@ -1,5 +1,6 @@
-const diskSpace = require('disk-space');
+const checkDiskSpace = require('check-disk-space').default;
 const os = require('os');
+const path = require('path');
 const { EventEmitter } = require('events');
 
 class SystemMonitor extends EventEmitter {
@@ -70,15 +71,25 @@ class SystemMonitor extends EventEmitter {
   }
 
   async getDiskMetrics() {
-    const mediaPath = process.env.MEDIA_PATH || './uploads/media';
-    const { free, size } = await diskSpace(mediaPath);
-    
-    return {
-      total: size,
-      free: free,
-      used: size - free,
-      usedPercentage: ((size - free) / size) * 100
-    };
+    try {
+      const mediaPath = path.resolve(process.env.MEDIA_PATH || '/workspaces/StreamAll/backend/uploads/media');
+      const diskInfo = await checkDiskSpace(mediaPath);
+      
+      return {
+        total: diskInfo.size,
+        free: diskInfo.free,
+        used: diskInfo.size - diskInfo.free,
+        usedPercentage: ((diskInfo.size - diskInfo.free) / diskInfo.size) * 100
+      };
+    } catch (error) {
+      console.error('Error getting disk metrics:', error);
+      return {
+        total: 0,
+        free: 0,
+        used: 0,
+        usedPercentage: 0
+      };
+    }
   }
 
   getMemoryMetrics() {
