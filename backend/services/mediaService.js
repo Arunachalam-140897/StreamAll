@@ -4,7 +4,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const MediaProcessor = require('../utils/mediaProcessor');
 const { v4: uuidv4 } = require('uuid');
-const { Op } = require('sequelize');
 
 class MediaService {
   static async create(data, file, adminId) {
@@ -76,24 +75,30 @@ class MediaService {
       search
     } = options;
 
-    const where = {};
-    if (category) where.category = category;
-    if (type) where.type = type;
-    if (genre) where.genre = { [Op.contains]: [genre] };
+    const query = {};
+    if (category) query.category = category;
+    if (type) query.type = type;
+    if (genre) query.genre = genre;
     if (search) {
-      where.title = { [Op.iLike]: `%${search}%` };
+      query.$text = { $search: search };
     }
 
-    return Media.findAndCountAll({
-      where,
-      order: [['createdAt', 'DESC']],
-      limit,
-      offset: (page - 1) * limit
-    });
+    const [total, items] = await Promise.all([
+      Media.countDocuments(query),
+      Media.find(query)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+    ]);
+
+    return {
+      rows: items,
+      count: total
+    };
   }
 
   static async getById(id) {
-    const media = await Media.findByPk(id);
+    const media = await Media.findById(id);
     if (!media) {
       throw new AppError('Media not found', 404);
     }
@@ -103,17 +108,18 @@ class MediaService {
   static async update(id, data, adminId) {
     const media = await this.getById(id);
     
-    if (media.createdBy !== adminId) {
+    if (media.createdBy.toString() !== adminId) {
       throw new AppError('You are not authorized to update this media', 403);
     }
 
-    return media.update(data);
+    Object.assign(media, data);
+    return media.save();
   }
 
   static async delete(id, adminId) {
     const media = await this.getById(id);
     
-    if (media.createdBy !== adminId) {
+    if (media.createdBy.toString() !== adminId) {
       throw new AppError('You are not authorized to delete this media', 403);
     }
 
@@ -133,7 +139,7 @@ class MediaService {
         await fs.remove(path.dirname(path.join(mediaDir, media.streamPath)));
       }
 
-      await media.destroy();
+      await media.deleteOne();
       return { message: 'Media deleted successfully' };
     } catch (error) {
       throw new AppError('Error deleting media files', 500);
@@ -143,7 +149,7 @@ class MediaService {
   static async getStreamUrl(id, userId) {
     const [media, preferences] = await Promise.all([
       this.getById(id),
-      UserPreferences.findOne({ where: { userId } })
+      UserPreferences.findOne({ userId })
     ]);
 
     const mediaDir = path.resolve(process.env.MEDIA_PATH || './uploads/media');

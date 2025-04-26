@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const app = require('./app');
 const systemMonitor = require('./utils/systemMonitor');
+const initializeMongoDB = require('./config/mongo-init');
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
@@ -9,7 +10,7 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-// Connect to MongoDB
+// Connect to MongoDB and initialize
 const connectDB = async () => {
   try {
     const mongoUri = process.env.MONGODB_URI || 
@@ -17,8 +18,11 @@ const connectDB = async () => {
     
     await mongoose.connect(mongoUri);
     console.log('MongoDB connected successfully');
+
+    // Initialize MongoDB with admin user and indexes
+    await initializeMongoDB();
   } catch (err) {
-    console.error('MongoDB connection error:', err);
+    console.error('MongoDB connection/initialization error:', err);
     process.exit(1);
   }
 };

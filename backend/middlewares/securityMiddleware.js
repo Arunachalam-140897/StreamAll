@@ -9,40 +9,24 @@ const setupSecurity = async (app) => {
   // HTTP Parameter Pollution protection
   app.use(hpp());
 
-  // Get allowed origins from environment or config
-  const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS ? 
-    process.env.CORS_ALLOWED_ORIGINS.split(',') : 
-    ['http://localhost:3000'];
+  // Enable Trust Proxy for all environments
+  app.set('trust proxy', 1);
 
-  // CORS configuration
-  app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    next();
-  });
+  // Get development frontend URL
+  const developmentOrigins = ['http://localhost:3000', 'http://localhost:5173'];
 
   // Content Security Policy
   app.use(helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
+      defaultSrc: ["'self'", ...developmentOrigins],
+      scriptSrc: ["'self'", "'unsafe-inline'", ...developmentOrigins],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", 'data:', 'blob:'],
-      mediaSrc: ["'self'", 'blob:'],
-      connectSrc: ["'self'"],
+      imgSrc: ["'self'", 'data:', 'blob:', ...developmentOrigins],
+      mediaSrc: ["'self'", 'blob:', ...developmentOrigins],
+      connectSrc: ["'self'", ...developmentOrigins],
       frameSrc: ["'none'"]
     }
   }));
-
-  // Enable Trust Proxy if behind reverse proxy
-  if (process.env.NODE_ENV === 'production') {
-    app.set('trust proxy', 1);
-  }
 
   // Compression for responses
   if (process.env.NODE_ENV === 'production') {

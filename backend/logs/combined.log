@@ -1,3 +1,21 @@
 2025-04-26T13:34:09.845Z [info]: [object Object] 
 2025-04-26T13:37:21.287Z [info]: [object Object] 
 2025-04-26T13:37:21.758Z [info]: [object Object] 
+2025-04-26T13:48:56.705Z [info]: [object Object] 
+2025-04-26T13:55:03.548Z [info]: [object Object] 
+2025-04-26T14:33:08.572Z [info]: [object Object] 
+2025-04-26T14:33:09.176Z [info]: [object Object] 
+2025-04-26T14:38:04.939Z [info]: [object Object] 
+2025-04-26T14:38:05.908Z [info]: [object Object] 
+2025-04-26T14:38:45.943Z [info]: [object Object] 
+2025-04-26T14:44:07.703Z [info]: [object Object] 
+2025-04-26T14:48:59.965Z [error]: Not allowed by CORS {"stack":"Error: Not allowed by CORS\n    at origin (/workspaces/StreamAll/backend/app.js:44:16)\n    at /workspaces/StreamAll/backend/node_modules/cors/lib/index.js:219:13\n    at optionsCallback (/workspaces/StreamAll/backend/node_modules/cors/lib/index.js:199:9)\n    at corsMiddleware (/workspaces/StreamAll/backend/node_modules/cors/lib/index.js:204:7)\n    at Layer.handleRequest (/workspaces/StreamAll/backend/node_modules/router/lib/layer.js:152:17)\n    at trimPrefix (/workspaces/StreamAll/backend/node_modules/router/index.js:342:13)\n    at /workspaces/StreamAll/backend/node_modules/router/index.js:297:9\n    at processParams (/workspaces/StreamAll/backend/node_modules/router/index.js:582:12)\n    at next (/workspaces/StreamAll/backend/node_modules/router/index.js:291:5)\n    at Function.handle (/workspaces/StreamAll/backend/node_modules/router/index.js:186:3)","type":"middleware_error","method":"OPTIONS","url":"/auth/login"}
+2025-04-26T14:51:58.567Z [info]: [object Object] 
+2025-04-26T14:53:35.895Z [error]: Media.findAndCountAll is not a function {"stack":"TypeError: Media.findAndCountAll is not a function\n    at MediaService.getAll (/workspaces/StreamAll/backend/services/mediaService.js:87:18)\n    at /workspaces/StreamAll/backend/controllers/mediaController.js:20:36\n    at /workspaces/StreamAll/backend/utils/errorHandler.js:13:19\n    at Layer.handleRequest (/workspaces/StreamAll/backend/node_modules/router/lib/layer.js:152:17)\n    at next (/workspaces/StreamAll/backend/node_modules/router/lib/route.js:157:13)\n    at /workspaces/StreamAll/backend/middlewares/validationMiddleware.js:13:5\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","type":"middleware_error","method":"GET","url":"/media"}
+2025-04-26T14:53:35.896Z [info]: [object Object] 
+2025-04-26T14:53:35.899Z [error]: Media.findAndCountAll is not a function {"stack":"TypeError: Media.findAndCountAll is not a function\n    at MediaService.getAll (/workspaces/StreamAll/backend/services/mediaService.js:87:18)\n    at /workspaces/StreamAll/backend/controllers/mediaController.js:20:36\n    at /workspaces/StreamAll/backend/utils/errorHandler.js:13:19\n    at Layer.handleRequest (/workspaces/StreamAll/backend/node_modules/router/lib/layer.js:152:17)\n    at next (/workspaces/StreamAll/backend/node_modules/router/lib/route.js:157:13)\n    at /workspaces/StreamAll/backend/middlewares/validationMiddleware.js:13:5\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","type":"middleware_error","method":"GET","url":"/media"}
+2025-04-26T14:53:35.900Z [info]: [object Object] 
+2025-04-26T14:59:11.876Z [info]: [object Object] 
+2025-04-26T14:59:11.884Z [info]: [object Object] 
+2025-04-26T15:01:09.176Z [info]: [object Object] 
+2025-04-26T15:01:09.204Z [info]: [object Object] 

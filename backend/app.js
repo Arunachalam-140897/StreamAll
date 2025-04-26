@@ -31,6 +31,24 @@ const systemRoutes = require('./routes/systemRoutes');
 
 const app = express();
 
+// Configure CORS first, before any other middleware
+const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS ? 
+  process.env.CORS_ALLOWED_ORIGINS.split(',') : 
+  ['http://localhost:3000', 'http://localhost:5173']; // Added Vite's default port
+
+app.use(cors({
+  origin: process.env.NODE_ENV === 'development' ? true : (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
 // Initialize security middleware
 setupSecurity(app).catch(console.error);
 
