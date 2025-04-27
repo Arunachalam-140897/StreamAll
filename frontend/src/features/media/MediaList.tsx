@@ -1,50 +1,131 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Grid, Card, CardContent, CardMedia, Typography, Container, Box, CircularProgress } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Box as MuiBox,
+  Card, CardContent, CardMedia, Typography, Container, 
+  CircularProgress, TextField, Select, MenuItem, FormControl, 
+  InputLabel, Toolbar, IconButton, CardActionArea, Pagination 
+} from '@mui/material';
+import Box from '@mui/system/Box';
+import SearchIcon from '@mui/icons-material/Search';
 import { fetchMedia } from './mediaSlice';
 import type { AppDispatch, RootState } from '../../store/store';
-import type { Media } from '../../types/media';
+import type { Media, MediaQueryParams } from '../../types/media';
 
 export default function MediaList() {
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { items, isLoading, error } = useSelector((state: RootState) => state.media as {
-    items: Media[];
-    isLoading: boolean;
-    error: string | null;
+  const { items, isLoading, error, currentPage, totalPages } = useSelector((state: RootState) => state.media);
+  const [filters, setFilters] = useState<MediaQueryParams>({
+    search: '',
+    category: '',
+    type: '',
+    page: 1,
+    limit: 12
   });
 
   useEffect(() => {
-    dispatch(fetchMedia({}));
-  }, [dispatch]);
+    dispatch(fetchMedia(filters));
+  }, [dispatch, filters]);
+
+  const handleFilterChange = (field: keyof MediaQueryParams, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [field]: value,
+      page: 1
+    }));
+  };
+
+  const handleMediaClick = (mediaId: string) => {
+    navigate(`/media/${mediaId}`);
+  };
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+    setFilters(prev => ({
+      ...prev,
+      page
+    }));
+  };
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+      <MuiBox display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
         <CircularProgress />
-      </Box>
+      </MuiBox>
     );
   }
 
   if (error) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+      <MuiBox display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
         <Typography color="error">{error}</Typography>
-      </Box>
+      </MuiBox>
     );
   }
 
   return (
     <Container sx={{ py: 4 }}>
-      <Grid container spacing={4}>
-        {items.map((media: Media) => (
-          <Grid 
-            key={media.id}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column'
+      <Toolbar sx={{ mb: 2 }}>
+        <Box display="flex" gap={2} width="100%">
+          <TextField
+            label="Search"
+            variant="outlined"
+            size="small"
+            value={filters.search}
+            onChange={(e) => handleFilterChange('search', e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <IconButton>
+                  <SearchIcon />
+                </IconButton>
+              ),
             }}
-          >
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          />
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={filters.category}
+              label="Category"
+              onChange={(e) => handleFilterChange('category', e.target.value)}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="movie">Movies</MenuItem>
+              <MenuItem value="series">Series</MenuItem>
+              <MenuItem value="animation">Animation</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>Type</InputLabel>
+            <Select
+              value={filters.type}
+              label="Type"
+              onChange={(e) => handleFilterChange('type', e.target.value)}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="video">Video</MenuItem>
+              <MenuItem value="audio">Audio</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      </Toolbar>
+
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(3, 1fr)',
+            lg: 'repeat(4, 1fr)'
+          },
+          gap: 4,
+          mb: 4
+        }}
+      >
+        {items.map((media: Media) => (
+          <Card key={media.id} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <CardActionArea onClick={() => handleMediaClick(media.id)}>
               <CardMedia
                 component="img"
                 sx={{
@@ -65,10 +146,22 @@ export default function MediaList() {
                   {media.genre.join(', ')}
                 </Typography>
               </CardContent>
-            </Card>
-          </Grid>
+            </CardActionArea>
+          </Card>
         ))}
-      </Grid>
+      </Box>
+
+      {totalPages > 1 && (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+            size="large"
+          />
+        </Box>
+      )}
     </Container>
   );
 }
